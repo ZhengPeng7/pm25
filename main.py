@@ -30,6 +30,14 @@ TBVs = np.loadtxt('data_preparation/TBVs.txt').tolist()
 entropies = np.loadtxt('data_preparation/entropies.txt').tolist()
 pm = np.loadtxt('data_preparation/pm25.txt').tolist()
 
+TBV_min = np.min(TBVs)
+TBV_range = np.max(TBVs) - TBV_min
+entro_min = np.min(entropies)
+entro_range = np.max(entropies) - entro_min
+
+TBVs = (TBVs - TBV_min) / TBV_range
+entropies = (entropies - entro_min) / entro_range
+
 config.testset_num = 81
 image_paths = image_paths[:-config.testset_num]
 TBVs = TBVs[:-config.testset_num]
@@ -63,6 +71,8 @@ for epoch in range(config.epochs):
             torch.from_numpy(batch_entropy).float().cuda()
         )
 
+        with open('preds.txt', 'a+') as fout:
+            fout.write('{:.3f}, {:.3f} --|-- {:.3f}, {:.3f}\n'.format(pm_pred[0].item(), pm_pred[1].item(), batch_pm[0], batch_pm[1]))
         loss = criterion(pm_pred, torch.tensor(batch_pm).float().cuda().unsqueeze(-1))
         loss = loss.to(config.device)
         losses_curr.append(loss.item())
