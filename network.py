@@ -58,7 +58,7 @@ class Decoder(nn.Module):
         TBV = TBV[:, :, :image.shape[2], :image.shape[3]]
         entropy = entropy[:, :, :image.shape[2], :image.shape[3]]
 
-        x = torch.cat([image, TBV, entropy], axis=1)
+        x = torch.cat([image, TBV, entropy], dim=1)
         x = x.view(x.size(0), -1)
         x = self.relu(self.dense_3(self.drop_2(self.dense_2(self.drop_1(self.dense_1(x))))))
 
