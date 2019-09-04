@@ -3,13 +3,12 @@ import cv2
 import numpy as np
 from PIL import Image, ImageFile
 import torch
-from sklearn.utils import shuffle
 
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-def gen_paths_of_image(root_path='../datasets/PM2.5/fog_1508_data'):
+def gen_paths_of_image(root_path='../datasets/PM2.5data/fog_1508_data'):
     paths = []
     scene_dirs = sorted(
         [os.path.join(root_path, p) for p in os.listdir(root_path)],
@@ -59,16 +58,16 @@ class DataGen():
         self.data_len = len(paths) if isinstance(paths, list) else np.squeeze(self.paths).shape[0]
         self.images = []
         for path in paths:
-            self.images.append(image_preprocessing(load_image(path)[124:856, ...]))
+            self.images.append(load_image(path)[124:856, ...])
 
     def gen_batch(self):
         batch_image, batch_TBV, batch_entropy, batch_pm = [], [], [], []
         for _ in range(self.batch_size):
-            image = self.images[self.anchor]
+            image = image_preprocessing(self.images[self.anchor])
             batch_image.append(image if np.random.random() < 0.5 else image[:, ::-1, :].copy())
 
-            batch_TBV.append(np.zeros(image.shape[:2])+self.TBVs[self.anchor])
-            batch_entropy.append(np.zeros(image.shape[:2])+self.entropies[self.anchor])
+            batch_TBV.append(np.expand_dims(np.zeros(image.shape[1:])+self.TBVs[self.anchor], 0))
+            batch_entropy.append(np.expand_dims(np.zeros(image.shape[1:])+self.entropies[self.anchor], 0))
             batch_pm.append(self.pm[self.anchor])
             self.anchor = (self.anchor + 1) % self.data_len
         batch_image, batch_TBV = np.asarray(batch_image), np.asarray(batch_TBV)

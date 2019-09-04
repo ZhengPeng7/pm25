@@ -39,13 +39,13 @@ class Decoder(nn.Module):
     def __init__(self):
         super(Decoder, self).__init__()
         # Image
-        self.conv1 = Conv2D_BN_activa(512, 128, 3, 1, 1)
+        self.conv1 = Conv2D_BN_activa(2048, 128, 3, 1, 1)
         self.conv2 = Conv2D_BN_activa(128, 64, 3, 1, 1)
         # TBV
         self.conv_TBV = Conv2D_BN_activa(1, 8, 3, 1, 1)
         # Entropy
         self.conv_ent = Conv2D_BN_activa(1, 8, 3, 1, 1)
-        self.dense_1 = nn.Linear(100, 128)
+        self.dense_1 = nn.Linear(364320, 128)
         self.drop_1 = nn.Dropout(0.2)
         self.dense_2 = nn.Linear(128, 64)
         self.drop_2 = nn.Dropout(0.2)
@@ -55,13 +55,10 @@ class Decoder(nn.Module):
     def forward(self, image, TBV, entropy):
         image = self.conv1(image)
         image = self.conv2(image)
+        TBV = TBV[:, :, :image.shape[2], :image.shape[3]]
+        entropy = entropy[:, :, :image.shape[2], :image.shape[3]]
 
-        TBV = self.conv_TBV(TBV)
-
-        entropy = self.conv_ent(entropy)
-
-        x = torch.cat([image, TBV, entropy], axis=0)
-        print(x.shape)
+        x = torch.cat([image, TBV, entropy], axis=1)
         x = x.view(x.size(0), -1)
         x = self.relu(self.dense_3(self.drop_2(self.dense_2(self.drop_1(self.dense_1(x))))))
 

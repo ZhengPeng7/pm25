@@ -10,7 +10,7 @@ class Config(object):
         self.save_dir = '../weights/PM2.5/weights_{}'.format(str(datetime.utcnow()).split()[0])
         # Training
         self.epochs = 100            # Training epochs
-        self.batch_size = 4         # ...
+        self.batch_size = 2         # ...
         self.batch_size_test = 1
         self.lr = 1e-4
         self.weight_decay = 0.0

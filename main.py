@@ -16,13 +16,6 @@ from network import Network
 
 config = Config()
 os.environ["CUDA_VISIBLE_DEVICES"] = config.GPUs
-criterion = torch.nn.MSELoss(reduction='sum').to(config.device)
-
-model = Network(pretrain=True)
-model = nn.DataParallel(model)
-model = model.cuda()
-
-optimizer = optim.Adam(model.parameters(), lr=config.lr, betas=(0.9, 0.999), weight_decay=config.weight_decay)
 
 if not os.path.exists(config.save_dir):
     os.makedirs(config.save_dir)
@@ -32,15 +25,17 @@ cudnn.benchmark = True
 
 # Data generator
 from data import gen_paths_of_image, DataGen
-image_paths = gen_paths_of_image(root_path='../datasets/PM2.5/fog_1508_data')
-TBVs = np.loadtxt('data_preparation/TBVs.txt')
-entropies = np.loadtxt('data_preparation/entropies.txt')
-pm = np.loadtxt('data_preparation/pm25.txt')
-config.testset_num = 20
-image_paths = image_paths[config.testset_num//2:len(image_paths)-config.testset_num//2]
-TBVs = TBVs[config.testset_num//2:len(image_paths)-config.testset_num//2]
-entropies = entropies[config.testset_num//2:len(image_paths)-config.testset_num//2]
-pm = pm[config.testset_num//2:len(image_paths)-config.testset_num//2]
+image_paths = gen_paths_of_image(root_path='../datasets/PM2.5data/fog_1508_data')
+TBVs = np.loadtxt('data_preparation/TBVs.txt').tolist()
+entropies = np.loadtxt('data_preparation/entropies.txt').tolist()
+pm = np.loadtxt('data_preparation/pm25.txt').tolist()
+
+config.testset_num = 81
+image_paths = image_paths[:-config.testset_num]
+TBVs = TBVs[:-config.testset_num]
+entropies = entropies[:-config.testset_num]
+pm = pm[:-config.testset_num]
+
 seed = 7
 random.seed(seed); random.shuffle(image_paths)
 random.seed(seed); random.shuffle(TBVs)
@@ -51,16 +46,24 @@ gen_train = DataGen(image_paths, TBVs, entropies, pm, batch_size=config.batch_si
 
 print('Train Len', gen_train.data_len)
 
-
 # Training
+model = Network(pretrain=True)
+model = nn.DataParallel(model)
+model = model.cuda()
+criterion = torch.nn.MSELoss(reduction='sum').to(config.device)
+optimizer = optim.Adam(model.parameters(), lr=config.lr, betas=(0.9, 0.999), weight_decay=config.weight_decay)
 model.train()
 for epoch in range(config.epochs):
     losses_curr = []
     for idx_load in range(0, gen_train.data_len, config.batch_size):
-        batch_image, TBV, entropy, pm = gen_train.gen_batch()
-        pm_pred = model(torch.from_numpy(batch_image).float().cuda())
+        batch_image, batch_TBV, batch_entropy, batch_pm = gen_train.gen_batch()
+        pm_pred = model(
+            torch.from_numpy(batch_image).float().cuda(),
+            torch.from_numpy(batch_TBV).float().cuda(),
+            torch.from_numpy(batch_entropy).float().cuda()
+        )
 
-        loss = criterion(pm_pred, pm)
+        loss = criterion(pm_pred, torch.tensor(batch_pm).float().cuda().unsqueeze(-1))
         loss = loss.to(config.device)
         losses_curr.append(loss.item())
 
@@ -73,7 +76,7 @@ for epoch in range(config.epochs):
     dict_ckpt = {'epoch': epoch + 1, 'state_dict': model.state_dict(), 'loss': loss}
     path_ckpt = os.path.join(config.save_dir, 'RRNet_epoch{}_loss{:.5f}.pth'.format(epoch+1, loss))
     torch.save(dict_ckpt, path_ckpt)
-    print('epoch={}, loss={}, time={}m'.format(epoch+1, loss, int((time.time()-config.time_st)/60)))
+    print('\nepoch={}, loss={}, time={}m'.format(epoch+1, loss, int((time.time()-config.time_st)/60)))
 
 # Loss plot
 plt.plot(config.losses)
