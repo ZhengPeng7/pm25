@@ -104,7 +104,7 @@ results = np.hstack([
 
 path_results = os.path.join(
     config.save_dir_test,
-    best_path_weights.split('/')[-1].replace('RRNet', 'results_of_weights_').replace('.pth', '_meanMAPE{:.3f}.csv'.format(best_MAPE_mean))
+    best_path_weights.split('/')[-1].replace('PMNet', 'results_of_weights_').replace('.pth', '_meanMAPE{:.3f}.csv'.format(best_MAPE_mean))
 )
 pd.DataFrame(results).to_csv(path_results, index=False, header=['Label', 'Predictions', 'MAPE(%)'])
 

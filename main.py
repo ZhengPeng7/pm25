@@ -91,7 +91,7 @@ for epoch in range(config.epochs):
     loss = np.mean(losses_curr)
     config.losses.append(loss)
     dict_ckpt = {'epoch': epoch + 1, 'state_dict': model.state_dict(), 'loss': loss}
-    path_ckpt = os.path.join(config.save_dir, 'RRNet_epoch{}_loss{:.5f}.pth'.format(epoch+1, loss))
+    path_ckpt = os.path.join(config.save_dir, 'PMNet_epoch{}_loss{:.5f}.pth'.format(epoch+1, loss))
     torch.save(dict_ckpt, path_ckpt)
     print('epoch={}, loss={}, time={}m'.format(epoch+1, loss, int((time.time()-config.time_st)/60)))
 
