@@ -4,9 +4,9 @@ import torch
 
 
 class Config(object):
-    def __init__(self):
+    def __init__(self, testset_num=1):
         # General
-        self.testset_num = 1
+        self.testset_num = testset_num
         self.dir_root = '../datasets/PM2.5'
         self.save_dir = '../weights/PM2.5/weights_{}_testset{}'.format(
             str(datetime.utcnow()).split()[0], self.testset_num
