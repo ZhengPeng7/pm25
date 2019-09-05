@@ -58,7 +58,7 @@ paths_weights = [
 ]
 best_preds, best_MAPEs, best_MAPE_mean, best_path_weights = [1e6], [1e6], 1e6, 'zhengpeng'
 
-for path_weights in paths_weights[:2]:
+for path_weights in paths_weights:
     print('Processing {}...'.format(path_weights.split('/')[-1]))
     st_k = list(torch.load(path_weights)['state_dict'].keys())
     st_v = list(torch.load(path_weights)['state_dict'].values())
