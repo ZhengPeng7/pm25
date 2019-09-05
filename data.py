@@ -48,13 +48,14 @@ def load_image(pth):
 
 
 class DataGen():
-    def __init__(self, paths, TBVs, entropies, pm, batch_size=4):
+    def __init__(self, paths, TBVs, entropies, pm, batch_size=4, training=True):
         self.anchor = 0
         self.paths = np.asarray(paths)
         self.TBVs = TBVs
         self.entropies = entropies
         self.pm = pm
         self.batch_size = batch_size
+        self.training = training
         self.data_len = len(paths) if isinstance(paths, list) else np.squeeze(self.paths).shape[0]
         self.images = []
         for path in paths:
@@ -64,7 +65,8 @@ class DataGen():
         batch_image, batch_TBV, batch_entropy, batch_pm = [], [], [], []
         for _ in range(self.batch_size):
             image = image_preprocessing(self.images[self.anchor])
-            batch_image.append(image if np.random.random() < 0.5 else image[:, ::-1, :].copy())
+            to_flip = self.training and np.random.random() < 0.5
+            batch_image.append(image if to_flip else image[:, ::-1, :].copy())
 
             batch_TBV.append(np.expand_dims(np.zeros(image.shape[1:])+self.TBVs[self.anchor], 0))
             batch_entropy.append(np.expand_dims(np.zeros(image.shape[1:])+self.entropies[self.anchor], 0))

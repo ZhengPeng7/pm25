@@ -63,7 +63,7 @@ optimizer = optim.Adam(model.parameters(), lr=config.lr, betas=(0.9, 0.999), wei
 model.train()
 for epoch in range(config.epochs):
     losses_curr = []
-    for idx_load in range(0, gen_train.data_len, config.batch_size):
+    for idx_load in range(0, gen_train.data_len, gen_train.batch_size):
         batch_image, batch_TBV, batch_entropy, batch_pm = gen_train.gen_batch()
         pm_pred = model(
             torch.from_numpy(batch_image).float().cuda(),
@@ -91,5 +91,5 @@ for epoch in range(config.epochs):
 # Loss plot
 plt.plot(config.losses)
 plt.legend(['losses'])
-plt.title('Final Loss = {:5.f}'.format(config.losses[-1]))
+plt.title('Final Loss = {:.3f}'.format(config.losses[-1]))
 plt.show()
