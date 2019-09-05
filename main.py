@@ -30,13 +30,18 @@ TBVs = np.loadtxt('data_preparation/TBVs.txt').tolist()
 entropies = np.loadtxt('data_preparation/entropies.txt').tolist()
 pm = np.loadtxt('data_preparation/pm25.txt').tolist()
 
-TBV_min = np.min(TBVs)
-TBV_range = np.max(TBVs) - TBV_min
-entro_min = np.min(entropies)
-entro_range = np.max(entropies) - entro_min
-
-TBVs = (TBVs - TBV_min) / TBV_range
-entropies = (entropies - entro_min) / entro_range
+method_on_TBV = 0
+if method_on_TBV == 0:
+    # Method-1 on TBVs
+    TBV_min = np.min(TBVs)
+    TBV_range = np.max(TBVs) - TBV_min
+    entro_min = np.min(entropies)
+    entro_range = np.max(entropies) - entro_min
+    TBVs = (TBVs - TBV_min) / TBV_range
+    entropies = (entropies - entro_min) / entro_range
+elif method_on_TBV == 1:
+    # Method-2 on TBVs
+    TBVs = np.log(TBVs) * 1.
 
 config.testset_num = 81
 image_paths = image_paths[:-config.testset_num]
