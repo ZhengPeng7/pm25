@@ -55,6 +55,7 @@ class Decoder(nn.Module):
     def forward(self, image, TBV, entropy):
         image = self.conv1(image)
         image = self.conv2(image)
+        # print('image.shape =', image.shape)
         TBV = TBV[:, :, :image.shape[2], :image.shape[3]]
         entropy = entropy[:, :, :image.shape[2], :image.shape[3]]
 

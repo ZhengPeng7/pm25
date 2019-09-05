@@ -30,6 +30,13 @@ TBVs = np.loadtxt('data_preparation/TBVs.txt').tolist()
 entropies = np.loadtxt('data_preparation/entropies.txt').tolist()
 pm = np.loadtxt('data_preparation/pm25.txt').tolist()
 
+num_files = [0, 150, 90, 120, 151, 150, 120]
+
+image_paths = image_paths[np.sum(num_files[:config.testset_num]):np.sum(num_files[config.testset_num+1])]
+TBVs = TBVs[np.sum(num_files[:config.testset_num]):np.sum(num_files[config.testset_num+1])]
+entropies = entropies[np.sum(num_files[:config.testset_num]):np.sum(num_files[config.testset_num+1])]
+pm = pm[np.sum(num_files[:config.testset_num]):np.sum(num_files[config.testset_num+1])]
+
 method_on_TBV = 0
 if method_on_TBV == 0:
     # Method-1 on TBVs
@@ -42,12 +49,6 @@ if method_on_TBV == 0:
 elif method_on_TBV == 1:
     # Method-2 on TBVs
     TBVs = np.log(TBVs) * 1.
-
-config.testset_num = 81
-image_paths = image_paths[:-config.testset_num]
-TBVs = TBVs[:-config.testset_num]
-entropies = entropies[:-config.testset_num]
-pm = pm[:-config.testset_num]
 
 seed = 7
 random.seed(seed); random.shuffle(image_paths)
@@ -77,7 +78,8 @@ for epoch in range(config.epochs):
         )
 
         with open('preds.txt', 'a+') as fout:
-            fout.write('{:.3f}, {:.3f} --|-- {:.3f}, {:.3f}\n'.format(pm_pred[0].item(), pm_pred[1].item(), batch_pm[0], batch_pm[1]))
+            fout.write('{:.3f}, {:.3f} --|-- {:.3f}, {:.3f}\n'.format(
+                pm_pred[0].item(), pm_pred[1].item(), batch_pm[0], batch_pm[1]))
         loss = criterion(pm_pred, torch.tensor(batch_pm).float().cuda().unsqueeze(-1))
         loss = loss.to(config.device)
         losses_curr.append(loss.item())
@@ -91,7 +93,7 @@ for epoch in range(config.epochs):
     dict_ckpt = {'epoch': epoch + 1, 'state_dict': model.state_dict(), 'loss': loss}
     path_ckpt = os.path.join(config.save_dir, 'RRNet_epoch{}_loss{:.5f}.pth'.format(epoch+1, loss))
     torch.save(dict_ckpt, path_ckpt)
-    print('\nepoch={}, loss={}, time={}m'.format(epoch+1, loss, int((time.time()-config.time_st)/60)))
+    print('epoch={}, loss={}, time={}m'.format(epoch+1, loss, int((time.time()-config.time_st)/60)))
 
 # Loss plot
 plt.plot(config.losses)

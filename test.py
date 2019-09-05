@@ -29,6 +29,13 @@ TBVs = np.loadtxt('data_preparation/TBVs.txt').tolist()
 entropies = np.loadtxt('data_preparation/entropies.txt').tolist()
 pm = np.loadtxt('data_preparation/pm25.txt').tolist()
 
+num_files = [0, 150, 90, 120, 151, 150, 120]
+
+image_paths = image_paths[np.sum(num_files[:config.testset_num]):np.sum(num_files[config.testset_num+1])]
+TBVs = TBVs[np.sum(num_files[:config.testset_num]):np.sum(num_files[config.testset_num+1])]
+entropies = entropies[np.sum(num_files[:config.testset_num]):np.sum(num_files[config.testset_num+1])]
+pm = pm[np.sum(num_files[:config.testset_num]):np.sum(num_files[config.testset_num+1])]
+
 method_on_TBV = 0
 if method_on_TBV == 0:
     # Method-1 on TBVs
@@ -41,12 +48,6 @@ if method_on_TBV == 0:
 elif method_on_TBV == 1:
     # Method-2 on TBVs
     TBVs = np.log(TBVs) * 1.
-
-config.testset_num = 81
-image_paths = image_paths[-config.testset_num:]
-TBVs = TBVs[-config.testset_num:]
-entropies = entropies[-config.testset_num:]
-pm = pm[-config.testset_num:]
 
 gen_test = DataGen(image_paths, TBVs, entropies, pm, batch_size=config.batch_size_test, training=False)
 
