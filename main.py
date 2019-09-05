@@ -32,10 +32,10 @@ for testset_num in [1, 2, 3]:
 
     num_files = [0, 150, 90, 120, 151, 150, 120]
 
-    image_paths = image_paths[:np.sum(num_files[:config.testset_num])] + image_paths[np.sum(num_files[config.testset_num+1]):]
-    TBVs = TBVs[:np.sum(num_files[:config.testset_num])] + TBVs[np.sum(num_files[config.testset_num+1]):]
-    entropies = entropies[:np.sum(num_files[:config.testset_num])] + entropies[np.sum(num_files[config.testset_num+1]):]
-    pm = pm[:np.sum(num_files[:config.testset_num])] + pm[np.sum(num_files[config.testset_num+1]):]
+    image_paths = image_paths[:np.sum(num_files[:config.testset_num])] + image_paths[np.sum(num_files[:config.testset_num+1]):]
+    TBVs = TBVs[:np.sum(num_files[:config.testset_num])] + TBVs[np.sum(num_files[:config.testset_num+1]):]
+    entropies = entropies[:np.sum(num_files[:config.testset_num])] + entropies[np.sum(num_files[:config.testset_num+1]):]
+    pm = pm[:np.sum(num_files[:config.testset_num])] + pm[np.sum(num_files[:config.testset_num+1]):]
 
     method_on_TBV = 0
     if method_on_TBV == 0:
