@@ -38,7 +38,7 @@ TBVs = TBVs[:np.sum(num_files[:config.testset_num])] + TBVs[np.sum(num_files[:co
 entropies = entropies[:np.sum(num_files[:config.testset_num])] + entropies[np.sum(num_files[:config.testset_num+1]):]
 pm = pm[:np.sum(num_files[:config.testset_num])] + pm[np.sum(num_files[:config.testset_num+1]):]
 
-method_on_TBV = 0
+method_on_TBV = 1
 if method_on_TBV == 0:
     # Method-1 on TBVs
     TBV_min = np.min(TBVs)

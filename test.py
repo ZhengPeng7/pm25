@@ -42,7 +42,7 @@ TBVs = TBVs[np.sum(num_files[:config.testset_num]):np.sum(num_files[:config.test
 entropies = entropies[np.sum(num_files[:config.testset_num]):np.sum(num_files[:config.testset_num+1])]
 pm = pm[np.sum(num_files[:config.testset_num]):np.sum(num_files[:config.testset_num+1])]
 
-method_on_TBV = 0
+method_on_TBV = 1
 if method_on_TBV == 0:
     # Method-1 on TBVs
     TBV_min = np.min(train_TBVs)
@@ -61,7 +61,6 @@ gen_test = DataGen(image_paths, TBVs, entropies, pm, batch_size=config.batch_siz
 model = Network(pretrain=True)
 # model = nn.DataParallel(model)
 model = model.cuda()
-model.eval()
 
 # config.save_dir = config.save_dir.replace('09-05', '09-04')
 paths_weights = [
@@ -78,6 +77,7 @@ for path_weights in paths_weights:
     for idx in range(len(st_k)):
         st[st_k[idx].replace('module.', '')] = st_v[idx]
     model.load_state_dict(st)
+    model.eval()
     pm_preds = []
     MAPEs = []
     for idx_load in range(0, gen_test.data_len, gen_test.batch_size):
@@ -92,12 +92,12 @@ for path_weights in paths_weights:
         batch_pm = np.squeeze(batch_pm)
         MAPE = np.abs(pm_pred - batch_pm) / batch_pm * 100
         MAPEs.append(MAPE)
-    print('\tMAPE_mean = {:.3f}, best_MAPE_mean = {:.3f}'.format(np.mean(MAPEs), best_MAPE_mean))
     if np.mean(MAPEs) < best_MAPE_mean:
         best_preds = pm_preds
         best_MAPEs = MAPEs
         best_path_weights = path_weights
         best_MAPE_mean = np.mean(MAPEs)
+    print('\tMAPE_mean = {:.3f}, best_MAPE_mean = {:.3f}'.format(np.mean(MAPEs), best_MAPE_mean))
 results = np.hstack([
     np.array(pm).reshape(-1, 1),
     np.array(best_preds).reshape(-1, 1),
@@ -112,11 +112,11 @@ path_results = os.path.join(
     config.save_dir_test,
     best_path_weights.split('/')[-1].replace('PMNet', 'results_of_weights_').replace('.pth', '_meanMAPE{:.3f}.csv'.format(best_MAPE_mean))
 )
-pd.DataFrame(results).to_csv(path_results, index=False, header=['Label', 'Predictions', 'MAPE(%)'])
+# pd.DataFrame(results).to_csv(path_results, index=False, header=['Label', 'Predictions', 'MAPE(%)'])
 
 plt.plot(pm, 'r')
 plt.plot(best_preds, 'g')
 plt.plot(best_MAPEs, 'b')
 plt.legend(['Label', 'Prediction', 'MAPE'])
 plt.title('RM2.5')
-plt.savefig(os.path.join(config.save_dir_test, 'results_plot.png'))
+# plt.savefig(os.path.join(config.save_dir_test, 'results_plot.png'))
