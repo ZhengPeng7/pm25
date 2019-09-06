@@ -62,7 +62,7 @@ for testset_num in [1, 2, 3]:
     model = model.cuda()
     model.eval()
 
-    config.save_dir = config.save_dir.replace('09-05', '09-04')
+    # config.save_dir = config.save_dir.replace('09-05', '09-04')
     paths_weights = [
         os.path.join(config.save_dir, p) for p in
         sorted(os.listdir(config.save_dir), key=lambda x: int(x.split('epoch')[1].split('_')[0]))

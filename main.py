@@ -96,6 +96,9 @@ for testset_num in [1, 2, 3]:
         print('epoch={}, loss={}, time={}m'.format(epoch+1, loss, int((time.time()-config.time_st)/60)))
 
     # Loss plot
+    if not os.path.exists(config.save_dir_test):
+        os.makedirs(config.save_dir_test)
+    print('save_dir:', config.save_dir_test)
     plt.plot(config.losses)
     plt.legend(['losses'])
     plt.title('Loss')
