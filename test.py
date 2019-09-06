@@ -13,7 +13,7 @@ from network import Network
 
 
 # Configurations
-testset_num = sys.argv[1] if len(sys.argv) == 2 else 1
+testset_num = int(sys.argv[1]) if len(sys.argv) == 2 else 1
 config = Config(testset_num=testset_num)
 os.environ["CUDA_VISIBLE_DEVICES"] = config.GPUs
 
