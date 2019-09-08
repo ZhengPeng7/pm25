@@ -42,7 +42,7 @@ TBVs = TBVs[np.sum(num_files[:config.testset_num]):np.sum(num_files[:config.test
 entropies = entropies[np.sum(num_files[:config.testset_num]):np.sum(num_files[:config.testset_num+1])]
 pm = pm[np.sum(num_files[:config.testset_num]):np.sum(num_files[:config.testset_num+1])]
 
-method_on_TBV = 1
+method_on_TBV = 0
 if method_on_TBV == 0:
     # Method-1 on TBVs
     TBV_min = np.min(train_TBVs)
@@ -62,7 +62,7 @@ model = Network(pretrain=True)
 # model = nn.DataParallel(model)
 model = model.cuda()
 
-# config.save_dir = config.save_dir.replace('09-05', '09-04')
+# config.save_dir = config.save_dir.replace('09-08', '09-07')
 paths_weights = [
     os.path.join(config.save_dir, p) for p in
     sorted(os.listdir(config.save_dir), key=lambda x: int(x.split('epoch')[1].split('_')[0]))
@@ -112,11 +112,11 @@ path_results = os.path.join(
     config.save_dir_test,
     best_path_weights.split('/')[-1].replace('PMNet', 'results_of_weights_').replace('.pth', '_meanMAPE{:.3f}.csv'.format(best_MAPE_mean))
 )
-# pd.DataFrame(results).to_csv(path_results, index=False, header=['Label', 'Predictions', 'MAPE(%)'])
+pd.DataFrame(results).to_csv(path_results, index=False, header=['Label', 'Predictions', 'MAPE(%)'])
 
 plt.plot(pm, 'r')
 plt.plot(best_preds, 'g')
 plt.plot(best_MAPEs, 'b')
 plt.legend(['Label', 'Prediction', 'MAPE'])
 plt.title('RM2.5')
-# plt.savefig(os.path.join(config.save_dir_test, 'results_plot.png'))
+plt.savefig(os.path.join(config.save_dir_test, 'results_plot.png'))

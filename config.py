@@ -8,12 +8,11 @@ class Config(object):
         # General
         self.testset_num = testset_num
         self.dir_root = '../datasets/PM2.5'
-        self.save_dir = '../weights/PM2.5/weights_{}_testset{}'.format(
-            str(datetime.utcnow()).split()[0], self.testset_num
-        )
-        self.save_dir_test = '../results/PM2.5/results_{}_testset{}'.format(
-            str(datetime.utcnow()).split()[0], self.testset_num
-        )
+        # self.save_dir = '../weights/PM2.5/weights_{}_testset{}'.format(
+        #     str(datetime.utcnow()).split()[0], self.testset_num
+        # )
+        self.save_dir = '../weights/PM2.5/weights_{}_testset()'.format('2019-09-08', self.testset_num)
+        self.save_dir_test = self.save_dir.replace('weights', 'results')
         # Training
         self.epochs = 20            # Training epochs
         self.batch_size = 2         # ...
