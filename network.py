@@ -41,7 +41,7 @@ class Decoder(nn.Module):
         self.if_bn = False
         # Image
         self.conv1 = Conv2D_BN_activa(2048, 128, 3, 1, 1)
-        self.conv2 = Conv2D_BN_activa(128, 126, 3, 1, 1)
+        self.conv2 = Conv2D_BN_activa(128, 127, 3, 1, 1)
         # TBV
         self.conv_TBV = Conv2D_BN_activa(1, 1, 3, 1, 1)
         # Entropy
@@ -62,9 +62,9 @@ class Decoder(nn.Module):
         image = self.conv2(image)
         # print('image.shape =', image.shape)
         TBV = TBV[:, :, :image.shape[2], :image.shape[3]]
-        entropy = entropy[:, :, :image.shape[2], :image.shape[3]]
+        # entropy = entropy[:, :, :image.shape[2], :image.shape[3]]
 
-        x = torch.cat([image, TBV, entropy], dim=1)
+        x = torch.cat([image, TBV], dim=1)
         x = x.view(x.size(0), -1)
 
         x = self.dense_1(x)
