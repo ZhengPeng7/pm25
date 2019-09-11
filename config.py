@@ -15,7 +15,7 @@ class Config(object):
         self.save_dir_test = self.save_dir.replace('weights', 'results')
         self.time_st = time.time()
         # Training
-        self.epochs = 20            # Training epochs
+        self.epochs = 5            # Training epochs
         self.batch_size = 8         # ...
         self.batch_size_test = 1
         self.lr = 1e-3
