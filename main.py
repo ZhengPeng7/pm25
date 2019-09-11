@@ -150,7 +150,7 @@ plt.savefig(os.path.join(config.save_dir_test, 'loss_plot.png'))
 
 
 results = np.hstack([
-    np.array(pm).reshape(-1, 1),
+    np.array(pm_test).reshape(-1, 1),
     np.array(best_preds).reshape(-1, 1),
     np.array(best_MAPEs).reshape(-1, 1)
 ])
