@@ -48,18 +48,22 @@ def load_image(pth):
 
 
 class DataGen():
-    def __init__(self, paths, TBVs, entropies, pm, batch_size=4, training=True):
+    def __init__(self, paths, TBVs, entropies, pm, batch_size=4, to_resize=True, training=False):
         self.anchor = 0
         self.paths = np.asarray(paths)
         self.TBVs = TBVs
         self.entropies = entropies
         self.pm = pm
         self.batch_size = batch_size
+        self.to_resize = to_resize
         self.training = training
         self.data_len = len(paths) if isinstance(paths, list) else np.squeeze(self.paths).shape[0]
         self.images = []
         for path in paths:
-            self.images.append(load_image(path)[124:856, ...])
+            image = load_image(path)[124:856, ...]
+            if to_resize:
+                image = cv2.resize(image, (1024, 768), interpolation=cv2.INTER_LINEAR)
+            self.images.append(image)
 
     def gen_batch(self):
         batch_image, batch_TBV, batch_entropy, batch_pm = [], [], [], []
@@ -68,8 +72,8 @@ class DataGen():
             to_flip = self.training and np.random.random() < 0.5
             batch_image.append(image if to_flip else image[:, ::-1, :].copy())
 
-            batch_TBV.append(np.expand_dims(np.zeros(image.shape[1:])+self.TBVs[self.anchor], 0))
-            batch_entropy.append(np.expand_dims(np.zeros(image.shape[1:])+self.entropies[self.anchor], 0))
+            batch_TBV.append(np.expand_dims(np.expand_dims(np.expand_dims(self.TBVs[self.anchor], -1), -1), -1))
+            batch_entropy.append(np.expand_dims(np.expand_dims(np.expand_dims(self.entropies[self.anchor], -1), -1), -1))
             batch_pm.append(self.pm[self.anchor])
             self.anchor = (self.anchor + 1) % self.data_len
         batch_image, batch_TBV = np.asarray(batch_image), np.asarray(batch_TBV)
