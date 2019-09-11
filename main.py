@@ -15,9 +15,13 @@ from network import Network
 
 
 # Configurations
-testset_num = int(sys.argv[1]) if len(sys.argv) == 2 else 1
+testset_num = int(sys.argv[1]) if len(sys.argv) >= 2 else 1
 config = Config(testset_num=testset_num)
 os.environ["CUDA_VISIBLE_DEVICES"] = config.GPUs
+
+idx_suffix = int(sys.argv[2]) if len(sys.argv) >= 3 else 0
+config.save_dir = '../weights/PM2.5/weights_{}_testset{}-{}'.format('2019-09-11', config.testset_num, idx_suffix)
+config.save_dir_test = config.save_dir.replace('weights', 'results')
 
 if not os.path.exists(config.save_dir):
     os.makedirs(config.save_dir)
@@ -79,7 +83,7 @@ model = nn.DataParallel(model)
 model = model.cuda()
 criterion = torch.nn.MSELoss(reduction='sum').to(config.device)
 optimizer = optim.Adam(model.parameters(), lr=config.lr, betas=(0.9, 0.999), weight_decay=config.weight_decay)
-for epoch in range(config.epochs):
+for epoch in range(config.epochs*2):
     gen_train = DataGen(image_paths, TBVs, entropies, pm, batch_size=config.batch_size, training=True)
     gen_test = DataGen(image_paths_test, TBVs_test, entropies_test, pm_test, batch_size=config.batch_size_test)
     losses_curr = []
@@ -126,7 +130,7 @@ for epoch in range(config.epochs):
                 best_MAPEs = MAPEs
                 best_MAPE_mean = np.mean(best_MAPEs)
                 best_dict_ckpt = {'epoch': epoch + 1, 'state_dict': model.state_dict(), 'loss': loss}
-                best_path_ckpt = os.path.join(config.save_dir, 'PMNet_epoch{}_idxload{}_loss{:.1f}_MAPE{:3.f}.pth'.format(epoch+1, idx_load, loss, best_MAPE_mean))
+                best_path_ckpt = os.path.join(config.save_dir, 'PMNet_epoch{}_idxload{}_loss{:.1f}_MAPE{:.3f}.pth'.format(epoch+1, idx_load, loss, best_MAPE_mean))
                 torch.save(best_dict_ckpt, best_path_ckpt)
             print('\tMAPE_mean = {:.3f}, best_MAPE_mean = {:.3f}'.format(np.mean(MAPEs), best_MAPE_mean))
 
@@ -144,7 +148,7 @@ plt.plot(config.losses)
 plt.legend(['losses'])
 plt.title('Loss')
 plt.savefig(os.path.join(config.save_dir_test, 'loss_plot.png'))
-
+plt.clf()
 
 results = np.hstack([
     np.array(pm_test).reshape(-1, 1),
