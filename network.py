@@ -43,12 +43,11 @@ class Decoder(nn.Module):
     def __init__(self):
         super(Decoder, self).__init__()
         # Image
-        self.conv1 = Conv2D_BN_activa(512, 128, 3, 1, 1)
-        self.conv2 = Conv2D_BN_activa(128, 126, 3, 1, 1)
+        self.conv1 = Conv2D_BN_activa(512, 126, 1, 1, 0)
         # TBV
-        self.conv_TBV = Conv2D_BN_activa(1, 1, 3, 1, 1)
+        self.conv_TBV = Conv2D_BN_activa(1, 1, 1, 1, 0)
         # Entropy
-        self.conv_ent = Conv2D_BN_activa(1, 1, 3, 1, 1)
+        self.conv_ent = Conv2D_BN_activa(1, 1, 1, 1, 0)
         self.dense_1 = nn.Linear(6272, 1024)
         self.relu_1 = nn.ReLU(inplace=True)
         self.drop_1 = nn.Dropout(0.2)
@@ -63,7 +62,6 @@ class Decoder(nn.Module):
 
     def forward(self, image, TBV, entropy):
         image = self.conv1(image)
-        image = self.conv2(image)
         # print('image.shape =', image.shape)
         TBV = torch.zeros((image.shape[0], 1, image.shape[-2], image.shape[-1]), dtype=image.dtype).cuda() + TBV
         entropy = torch.zeros((image.shape[0], 1, image.shape[-2], image.shape[-1]), dtype=image.dtype).cuda() + entropy

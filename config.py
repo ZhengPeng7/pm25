@@ -15,10 +15,10 @@ class Config(object):
         self.save_dir_test = self.save_dir.replace('weights', 'results')
         self.time_st = time.time()
         # Training
-        self.epochs = 2            # Training epochs
+        self.epochs = 20            # Training epochs
         self.batch_size = 8         # ...
         self.batch_size_test = 1
-        self.lr = 1e-4
+        self.lr = 1e-3
         self.weight_decay = 0.0
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.losses = []

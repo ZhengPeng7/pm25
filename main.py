@@ -21,10 +21,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = config.GPUs
 
 if not os.path.exists(config.save_dir):
     os.makedirs(config.save_dir)
-print('save_dir_test:', config.save_dir)
-if not os.path.exists(config.save_dir_test):
-    os.makedirs(config.save_dir_test)
-print('save_dir_test:', config.save_dir_test)
+print('save_dir:', config.save_dir)
 cudnn.benchmark = True
 
 
@@ -129,7 +126,7 @@ for epoch in range(config.epochs):
                 best_MAPEs = MAPEs
                 best_MAPE_mean = np.mean(best_MAPEs)
                 best_dict_ckpt = {'epoch': epoch + 1, 'state_dict': model.state_dict(), 'loss': loss}
-                best_path_ckpt = os.path.join(config.save_dir, 'PMNet_epoch{}_idxload{}_loss{:.1f}_MAPE{}.pth'.format(epoch+1, idx_load, loss, best_MAPE_mean))
+                best_path_ckpt = os.path.join(config.save_dir, 'PMNet_epoch{}_idxload{}_loss{:.1f}_MAPE{:3.f}.pth'.format(epoch+1, idx_load, loss, best_MAPE_mean))
                 torch.save(best_dict_ckpt, best_path_ckpt)
             print('\tMAPE_mean = {:.3f}, best_MAPE_mean = {:.3f}'.format(np.mean(MAPEs), best_MAPE_mean))
 
@@ -156,10 +153,7 @@ results = np.hstack([
 ])
 
 
-path_results = os.path.join(
-    config.save_dir_test,
-    best_path_ckpt.replace('PMNet', 'results').replace('.pth', '_MAPE{}.csv'.format(best_MAPE_mean))
-)
+path_results = best_path_ckpt.replace('weights', 'results').replace('PMNet', 'results').replace('.pth', '.csv')
 pd.DataFrame(results).to_csv(path_results, index=False, header=['Label', 'Predictions', 'MAPE(%)'])
 
 plt.plot(pm_test, 'r')
