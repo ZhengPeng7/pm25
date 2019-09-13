@@ -20,7 +20,7 @@ config = Config(testset_num=testset_num)
 os.environ["CUDA_VISIBLE_DEVICES"] = config.GPUs
 
 idx_suffix = int(sys.argv[2]) if len(sys.argv) >= 3 else 0
-config.save_dir = '../weights/PM2.5/weights_{}_testset{}-{}'.format('2019-09-11', config.testset_num, idx_suffix)
+config.save_dir = '../weights/PM2.5/weights_{}_testset{}-{}'.format('2019-09-13', config.testset_num, idx_suffix)
 config.save_dir_test = config.save_dir.replace('weights', 'results')
 
 if not os.path.exists(config.save_dir):
@@ -83,7 +83,7 @@ model = nn.DataParallel(model)
 model = model.cuda()
 criterion = torch.nn.MSELoss(reduction='sum').to(config.device)
 optimizer = optim.Adam(model.parameters(), lr=config.lr, betas=(0.9, 0.999), weight_decay=config.weight_decay)
-for epoch in range(config.epochs*2):
+for epoch in range(config.epochs):
     gen_train = DataGen(image_paths, TBVs, entropies, pm, batch_size=config.batch_size, training=True)
     gen_test = DataGen(image_paths_test, TBVs_test, entropies_test, pm_test, batch_size=config.batch_size_test)
     losses_curr = []
