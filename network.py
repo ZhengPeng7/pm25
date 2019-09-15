@@ -27,15 +27,10 @@ class Conv2D_BN_activa(nn.Module):
 class Encoder(nn.Module):
     def __init__(self, pretrain=True):
         super(Encoder, self).__init__()
-        # self.conv1 = nn.Sequential(*list(models.resnet50(pretrained=pretrain).children())[0:3])
-        # self.conv2 = nn.Sequential(*list(models.resnet50(pretrained=pretrain).children())[4:8])
         self.vgg_backbone = nn.Sequential(*list(models.vgg16_bn(pretrained=pretrain).children())[:-1])
 
     def forward(self, x):
-        # x = self.conv1(x)
-        # x = self.conv2(x)
         x = self.vgg_backbone(x)
-        # print('Shape of ouput of vgg_bb:', x.shape)
         return x
 
 
@@ -43,7 +38,7 @@ class Decoder(nn.Module):
     def __init__(self):
         super(Decoder, self).__init__()
         # Image
-        self.conv1 = Conv2D_BN_activa(512, 128, 1, 1, 0)
+        self.conv1 = Conv2D_BN_activa(512, 126, 1, 1, 0)
         # TBV
         self.conv_TBV = Conv2D_BN_activa(1, 1, 1, 1, 0)
         # Entropy
@@ -62,13 +57,12 @@ class Decoder(nn.Module):
 
     def forward(self, image, TBV, entropy):
         image = self.conv1(image)
-        # print('image.shape =', image.shape)
-        # TBV = torch.zeros((image.shape[0], 1, image.shape[-2], image.shape[-1]), dtype=image.dtype).cuda() + TBV
-        # entropy = torch.zeros((image.shape[0], 1, image.shape[-2], image.shape[-1]), dtype=image.dtype).cuda() + entropy
 
-        x = torch.cat([image], dim=1)
+        TBV = torch.zeros((image.shape[0], 1, image.shape[-2], image.shape[-1]), dtype=image.dtype).cuda() + TBV
+        entropy = torch.zeros((image.shape[0], 1, image.shape[-2], image.shape[-1]), dtype=image.dtype).cuda() + entropy
+
+        x = torch.cat([image, TBV, entropy], dim=1)
         x = x.view(x.size(0), -1)
-        # print('Shape of x right before dense layers:', x.shape)
 
         x = self.dense_1(x)
         x = self.relu_1(x)
